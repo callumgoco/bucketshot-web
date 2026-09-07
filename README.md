@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BucketShot Web
 
-## Getting Started
+The web companion to the BucketShot iOS app. It uses the same Supabase project, anon key, tables, storage buckets, and row-level security. Guests can browse the UK catalog. Sign-in, saves, trips, collections, comments, and publishing use the same account as iOS.
 
-First, run the development server:
+## Setup
 
 ```bash
+cd bucketshot-web
+cp .env.example .env.local
+# fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Add `http://localhost:3000/auth/callback` to Supabase **Authentication → URL Configuration → Redirect URLs** so magic links can return to the web app. Leave `bucketshot://auth-callback` in place for iOS.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` — local app
+- `npm test` — Vitest unit tests
+- `npm run test:e2e` — Playwright browse journeys
+- `BUCKETSHOT_LIVE_INTEGRATION=1 npm test` — opt-in read against the live project
 
-## Learn More
+## Substitutions from iOS
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Maps: MapLibre GL with CARTO light/dark tiles, not MapKit
+- Weather: Open-Meteo, not WeatherKit
+- Sun and moon: `suncalc`, checked against the same coordinate math
+- Auth: email/password and magic link. Sign in with Apple stays on iOS
+- Photo import: file input plus `exifr` for EXIF and GPS

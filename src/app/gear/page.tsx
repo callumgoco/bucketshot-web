@@ -8,6 +8,7 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await params;
-  await searchParams;
-  return <Screen />;
+  const query = await searchParams;
+  const q = Array.isArray(query.q) ? query.q[0] : query.q ?? "";
+  return <Screen query={q} />;
 }
