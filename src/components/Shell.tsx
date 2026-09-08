@@ -127,5 +127,8 @@ function AuthModal() {
 
 export function useGo() {
   const router = useRouter();
-  return router.push;
+
+  return (href: string) => {
+    router.push(href);
+  };
 }
