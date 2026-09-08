@@ -73,9 +73,12 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader title="Worth Photographing This Weekend" />
         <div className="flex gap-3 overflow-x-auto no-scrollbar">
-          {sections.weekend.map((shot) => (
-            <ShotCard key={shot.id} href={`/shots/${shot.id}`} title={shot.title} meta={app.catalog.locations.find((item) => item.id === shot.locationId)?.name ?? ""} image={shot.coverImage.url} />
-          ))}
+          {sections.weekend.map((shot) => {
+            const location = app.catalog.locations.find((item) => item.id === shot.locationId);
+            return (
+              <ShotCard key={shot.id} href={`/shots/${shot.id}`} title={shot.title} meta={location?.name ?? ""} image={shot.coverImage.url ?? location?.coverImage.url} />
+            );
+          })}
         </div>
       </section>
 
@@ -100,7 +103,10 @@ export default function DiscoverPage() {
       <section>
         <SectionHeader title="Bucket Shots Near You" />
         <div className="flex gap-3 overflow-x-auto no-scrollbar">
-          {sections.nearby.map((shot) => <ShotCard key={shot.id} href={`/shots/${shot.id}`} title={shot.title} meta="Edinburgh" image={shot.coverImage.url} />)}
+          {sections.nearby.map((shot) => {
+            const location = app.catalog.locations.find((item) => item.id === shot.locationId);
+            return <ShotCard key={shot.id} href={`/shots/${shot.id}`} title={shot.title} meta="Edinburgh" image={shot.coverImage.url ?? location?.coverImage.url} />;
+          })}
         </div>
       </section>
 

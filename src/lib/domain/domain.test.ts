@@ -3,7 +3,8 @@ import { decodeModeration, decodeSavedStatus, encodeModeration, encodeSavedStatu
 import { displayCoordinate } from "@/lib/services/coordinatePrivacy";
 import { searchCatalog } from "@/lib/services/search";
 import { clusterLocations, regionContains } from "@/lib/services/clustering";
-import { lightTimes } from "@/lib/services/conditions";
+import { lightTimes, formatClock, lightTimesArePlausible } from "@/lib/services/conditions";
+import { timeZoneForCoordinate } from "@/lib/services/timezone";
 import { dayCount } from "@/lib/services/trips";
 import type { CatalogSnapshot, PhotographyLocation } from "@/lib/domain/types";
 
@@ -100,6 +101,22 @@ describe("conditions and trips", () => {
     const times = lightTimes({ latitude: 56.8, longitude: -5.1 }, new Date("2026-06-21T12:00:00Z"));
     expect(times.sunrise).not.toBeNull();
     expect(times.sunset && times.sunrise && times.sunset > times.sunrise).toBe(true);
+  });
+
+  it("formats light times in the location timezone, not the viewer timezone", () => {
+    const coordinate = { latitude: 57.3, longitude: -6.2 };
+    const timeZone = timeZoneForCoordinate(coordinate);
+    const times = lightTimes(coordinate, new Date("2026-09-08T12:00:00Z"));
+    expect(lightTimesArePlausible(times, timeZone)).toBe(true);
+    const sunrise = formatClock(times.sunrise, timeZone);
+    const sunset = formatClock(times.sunset, timeZone);
+    const riseHour = Number(sunrise.split(":")[0]);
+    const setHour = Number(sunset.split(":")[0]);
+    expect(riseHour).toBeGreaterThanOrEqual(4);
+    expect(riseHour).toBeLessThanOrEqual(9);
+    expect(setHour).toBeGreaterThanOrEqual(16);
+    expect(setHour).toBeLessThanOrEqual(22);
+    expect(formatClock(times.sunrise, "America/Los_Angeles")).not.toBe(sunrise);
   });
 
   it("counts inclusive trip days", () => {

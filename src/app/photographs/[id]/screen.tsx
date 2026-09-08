@@ -11,15 +11,20 @@ export default function PhotographPage() {
   const { id } = useParams<{ id: string }>();
   const app = useApp();
   const router = useRouter();
-  if (!app.ready) return <p className="text-[var(--bs-text-secondary)]">Loading…</p>;
-  const photo = app.catalog.photographs.find((item) => item.id === id);
   const [body, setBody] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
+
+  if (!app.ready) return <p className="text-[var(--bs-text-secondary)]">Loading…</p>;
+  if (app.error) return <EmptyState title="Could not load BucketShot" message={app.error} action={<button onClick={() => void app.refresh()}>Retry</button>} />;
+
+  const photo = app.catalog.photographs.find((item) => item.id === id);
   if (!photo) return <EmptyState title="Photograph not found" message="This photograph is not available." />;
+
   const photographer = app.catalog.photographers.find((item) => item.id === photo.userId);
   const location = app.catalog.locations.find((item) => item.id === photo.locationId);
   const thread = app.comments.filter((item) => item.photoId === photo.id);
   const related = app.catalog.photographs.filter((item) => item.id !== photo.id && (item.bucketShotId === photo.bucketShotId || item.locationId === photo.locationId || item.userId === photo.userId));
+
   return (
     <article>
       <button onClick={() => router.push(`/photographs/${photo.id}/view`)} className="block w-full">
