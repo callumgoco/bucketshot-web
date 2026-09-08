@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useApp } from "@/components/AppState";
 import { Cover, EmptyState, PhotoCard, SpecList } from "@/components/ui";
 import { glanceLine, lightLabels, savedShotLabels } from "@/lib/domain/types";
-import { fetchWeather, formatClock, lightTimes, moonPhase, type WeatherSnapshot } from "@/lib/services/conditions";
+import { fetchWeather, formatClock, lightTimes, lightTimesArePlausible, moonPhase, type WeatherSnapshot } from "@/lib/services/conditions";
+import { timeZoneForCoordinate } from "@/lib/services/timezone";
 
 export default function LocationPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,8 @@ export default function LocationPage() {
   const shots = app.catalog.bucketShots.filter((item) => item.locationId === location.id);
   const photos = app.catalog.photographs.filter((item) => item.locationId === location.id);
   const times = location.coordinate ? lightTimes(location.coordinate) : null;
+  const timeZone = location.coordinate ? timeZoneForCoordinate(location.coordinate) : null;
+  const plausibleTimes = times && timeZone && lightTimesArePlausible(times, timeZone);
   const moon = location.coordinate ? moonPhase(location.coordinate) : null;
   const maps = location.coordinate ? `https://www.google.com/maps/dir/?api=1&destination=${location.coordinate.latitude},${location.coordinate.longitude}` : null;
   return (
@@ -43,16 +46,21 @@ export default function LocationPage() {
       <h2 className="mt-8 text-xl font-semibold">Bucket Shots</h2>
       <div className="mt-3 space-y-2">{shots.map((shot) => <Link key={shot.id} href={`/shots/${shot.id}`} className="block rounded-[12px] bg-[var(--bs-surface)] p-3">{shot.title} · {app.saved.bucketShotStatuses[shot.id] ? savedShotLabels[app.saved.bucketShotStatuses[shot.id]] : "Not saved"}</Link>)}</div>
       <h2 className="mt-8 text-xl font-semibold">Conditions</h2>
-      {times ? (
-        <div className="mt-3 grid gap-3 md:grid-cols-4">
-          <Stat label="Sunrise" value={formatClock(times.sunrise)} />
-          <Stat label="Golden hour" value={formatClock(times.goldenHourEveningStart)} />
-          <Stat label="Sunset" value={formatClock(times.sunset)} />
-          <Stat label="Blue hour" value={formatClock(times.blueHourEveningStart)} />
-        </div>
+      {times && timeZone ? (
+        plausibleTimes ? (
+          <div className="mt-3 grid gap-3 md:grid-cols-4">
+            <Stat label="Sunrise" value={formatClock(times.sunrise, timeZone)} />
+            <Stat label="Golden hour" value={formatClock(times.goldenHourEveningStart, timeZone)} />
+            <Stat label="Sunset" value={formatClock(times.sunset, timeZone)} />
+            <Stat label="Blue hour" value={formatClock(times.blueHourEveningStart, timeZone)} />
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-[var(--bs-text-secondary)]">Light times are unavailable for this location right now.</p>
+        )
       ) : null}
+      {plausibleTimes && timeZone ? <p className="mt-2 text-xs text-[var(--bs-text-tertiary)]">Times shown in local time ({timeZone.replace("_", " ")})</p> : null}
       {weather ? <p className="mt-3 text-sm text-[var(--bs-text-secondary)]">{weather.summary} · {Math.round(weather.temperature)}° · cloud {weather.cloudCover}% · rain {weather.precipitation}mm · wind {weather.windSpeed} m/s · Open-Meteo</p> : null}
-      {moon ? <p className="mt-2 text-sm text-[var(--bs-text-secondary)]">{moon.name} · rise {formatClock(moon.rise)} · set {formatClock(moon.set)}</p> : null}
+      {moon && timeZone ? <p className="mt-2 text-sm text-[var(--bs-text-secondary)]">{moon.name} · rise {formatClock(moon.rise, timeZone)} · set {formatClock(moon.set, timeZone)}</p> : null}
       <p className="mt-2 text-sm">{location.preferredLight.map((item) => lightLabels[item]).join(", ")}</p>
       <h2 className="mt-8 text-xl font-semibold">Photography tips</h2>
       <div className="mt-3 space-y-3">{location.tips.map((tip) => <div key={tip.id} className="rounded-[16px] bg-[var(--bs-surface)] p-4"><h3 className="font-semibold">{tip.title}</h3><p className="text-sm text-[var(--bs-text-secondary)]">{tip.detail}</p></div>)}</div>

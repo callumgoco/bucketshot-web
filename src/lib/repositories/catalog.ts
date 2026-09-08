@@ -46,12 +46,14 @@ export async function loadCatalog(): Promise<CatalogSnapshot> {
   }
 
   return {
-    destinations: (destinations.data ?? []).map((row) => mapDestination(row as Record<string, unknown>)),
-    locations: (locations.data ?? []).map((row) => {
-      const mapped = mapLocation(row as Record<string, unknown>, tipsByLocation.get(String((row as { id: string }).id)) ?? []);
-      return mapped;
-    }),
-    bucketShots: (shots.data ?? []).map((row) => mapBucketShot(row as Record<string, unknown>)),
+    destinations: await signCoverImages((destinations.data ?? []).map((row) => mapDestination(row as Record<string, unknown>))),
+    locations: await signCoverImages(
+      (locations.data ?? []).map((row) => {
+        const mapped = mapLocation(row as Record<string, unknown>, tipsByLocation.get(String((row as { id: string }).id)) ?? []);
+        return mapped;
+      }),
+    ),
+    bucketShots: await signCoverImages((shots.data ?? []).map((row) => mapBucketShot(row as Record<string, unknown>))),
     photographs: await signPhotographImages((photos.data ?? []).map((row) => mapPhotograph(row as Record<string, unknown>))),
     photographers: (profiles.data ?? []).map((row) => mapProfile(row as Record<string, unknown>)),
     projects: (projects.data ?? []).map((row) => mapProject(row as Record<string, unknown>)),
@@ -70,6 +72,36 @@ async function signPhotographImages(photos: Photograph[]): Promise<Photograph[]>
     const url = photo.imagePath ? signed.get(photo.imagePath) : null;
     return url ? { ...photo, image: { ...photo.image, url: url } } : photo;
   });
+}
+
+type CoverImageItem = { coverImage: { url: string | null; altText: string } };
+
+/** Re-sign expired Supabase storage URLs for catalog cover images. */
+async function signCoverImages<T extends CoverImageItem>(items: T[], bucket = "location-images"): Promise<T[]> {
+  const pathByIndex = items.map((item) => extractStoragePath(item.coverImage.url, bucket));
+  const paths = [...new Set(pathByIndex.filter((path): path is string => Boolean(path)))];
+  if (!paths.length) return items;
+  const { data, error } = await client().storage.from(bucket).createSignedUrls(paths, 60 * 60 * 24 * 7);
+  if (error || !data) return items;
+  const signed = new Map(data.filter((item) => item.signedUrl).map((item) => [item.path, item.signedUrl]));
+  return items.map((item, index) => {
+    const path = pathByIndex[index];
+    const url = path ? signed.get(path) : null;
+    return url ? { ...item, coverImage: { ...item.coverImage, url } } : item;
+  });
+}
+
+function extractStoragePath(url: string | null, bucket: string): string | null {
+  if (!url) return null;
+  try {
+    const pathname = new URL(url).pathname;
+    for (const prefix of [`/storage/v1/object/sign/${bucket}/`, `/storage/v1/object/public/${bucket}/`, `/storage/v1/object/authenticated/${bucket}/`]) {
+      if (pathname.startsWith(prefix)) return decodeURIComponent(pathname.slice(prefix.length));
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 function mapProject(row: Record<string, unknown>): PhotoProject {

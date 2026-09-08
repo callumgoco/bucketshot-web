@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useApp } from "@/components/AppState";
 import { Cover, EmptyState, PhotoCard, SpecList } from "@/components/ui";
 import { focalLabel, lightLabels, savedShotLabels, savedShotStatuses } from "@/lib/domain/types";
-import { fetchWeather, formatClock, lightTimes, matchScore, type WeatherSnapshot } from "@/lib/services/conditions";
+import { fetchWeather, formatClock, lightTimes, lightTimesArePlausible, matchScore, type WeatherSnapshot } from "@/lib/services/conditions";
+import { timeZoneForCoordinate } from "@/lib/services/timezone";
 
 export default function ShotPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,8 @@ export default function ShotPage() {
   const saved = app.saved.bucketShotIds.includes(shot.id);
   const status = app.saved.bucketShotStatuses[shot.id];
   const times = location?.coordinate ? lightTimes(location.coordinate) : null;
+  const timeZone = location?.coordinate ? timeZoneForCoordinate(location.coordinate) : null;
+  const plausibleTimes = times && timeZone && lightTimesArePlausible(times, timeZone);
   const match = matchScore(shot.bestLight, weather);
   const versions = app.catalog.photographs.filter((item) => item.bucketShotId === shot.id);
   return (
@@ -38,7 +41,7 @@ export default function ShotPage() {
       </div>
       <h2 className="mt-8 text-xl font-semibold">When to shoot it</h2>
       <p className="mt-2">{shot.bestLight.map((item) => lightLabels[item]).join(", ")} · {shot.seasonNotes.join(", ")}</p>
-      {times ? <p className="mt-2 text-sm text-[var(--bs-text-secondary)]">Today sunrise {formatClock(times.sunrise)} · sunset {formatClock(times.sunset)} · match {match.label}</p> : null}
+      {plausibleTimes && timeZone ? <p className="mt-2 text-sm text-[var(--bs-text-secondary)]">Today sunrise {formatClock(times!.sunrise, timeZone)} · sunset {formatClock(times!.sunset, timeZone)} · match {match.label}</p> : null}
       <h2 className="mt-8 text-xl font-semibold">How to capture it</h2>
       <div className="mt-3"><SpecList rows={[["Focal length", focalLabel(shot)], ["Aperture", shot.suggestedAperture], ["Shutter", shot.suggestedShutterSpeed], ["ISO", shot.suggestedIso ? String(shot.suggestedIso) : null], ["Orientation", shot.orientation], ["Tripod", shot.tripodRecommended ? "Recommended" : null], ["Filter", shot.filterNotes]]} /></div>
       {shot.camera && shot.subject ? (

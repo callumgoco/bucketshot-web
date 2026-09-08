@@ -7,7 +7,11 @@ import { categoryLabels, type PhotographyCategory } from "@/lib/domain/types";
 export function Cover({ src, alt, className = "" }: { src?: string | null; alt: string; className?: string }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
-    return <div className={`bg-[var(--bs-placeholder)] ${className}`} aria-label={alt} />;
+    return (
+      <div className={`grid place-items-center bg-[var(--bs-raised)] text-[var(--bs-text-tertiary)] ${className}`} aria-label={alt}>
+        <span className="px-3 text-center text-xs">{failed ? "Image unavailable" : "No image"}</span>
+      </div>
+    );
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
