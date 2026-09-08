@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useApp } from "@/components/AppState";
 import { fieldClass, PrimaryButton, SecondaryButton } from "@/components/ui";
@@ -126,6 +126,6 @@ function AuthModal() {
 }
 
 export function useGo() {
-  const router = router();
+  const router = useRouter();
   return router.push;
 }
