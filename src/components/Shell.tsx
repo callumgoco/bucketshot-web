@@ -126,6 +126,6 @@ function AuthModal() {
 }
 
 export function useGo() {
-  const router = useRouter();
+  const router = router();
   return router.push;
 }
