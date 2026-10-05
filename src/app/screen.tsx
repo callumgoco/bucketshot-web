@@ -23,9 +23,13 @@ export default function LandingPage() {
   const locations = app.catalog.locations;
 
   const hero = destinations.find((item) => /skye|edinburgh|glencoe/i.test(item.name)) ?? destinations[0];
-  const discoverImage = destinations[1]?.coverImage.url ?? hero?.coverImage.url;
-  const mapImage = locations[0]?.coverImage.url ?? destinations[2]?.coverImage.url ?? hero?.coverImage.url;
-  const planImage = shots[0]?.coverImage.url ?? destinations[3]?.coverImage.url ?? hero?.coverImage.url;
+  const railDestinations = destinations.slice(0, 10);
+  const primaryShot = shots[0];
+  const secondaryShot = shots[1] ?? shots[0];
+  const secondaryLocation = locations[0];
+  const mapImage = locations[1]?.coverImage.url ?? locations[0]?.coverImage.url ?? hero?.coverImage.url;
+  const discoverHero = primaryShot?.coverImage.url ?? destinations[1]?.coverImage.url ?? hero?.coverImage.url;
+  const planImage = shots[2]?.coverImage.url ?? primaryShot?.coverImage.url ?? hero?.coverImage.url;
 
   function goToSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,117 +39,241 @@ export default function LandingPage() {
 
   return (
     <div className="bg-[#0c0c0d] text-white">
-      <section className="relative min-h-screen overflow-hidden">
-        <div className="absolute inset-0 bs-landing-hero-media">
-          <Cover src={hero?.coverImage.url} alt="" className="h-full w-full" />
-          <div className="bs-onboarding-scrim absolute inset-0" />
+      <section className="relative flex min-h-screen flex-col overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="bs-landing-hero-media-inner absolute inset-[-8%]">
+            <Cover src={hero?.coverImage.url} alt="" className="h-full w-full" />
+          </div>
+          <div className="bs-landing-cinematic-scrim absolute inset-0" />
+          <div className="bs-landing-grain absolute inset-0" aria-hidden="true" />
         </div>
-        <header className="relative z-10 flex items-center justify-between px-6 py-6 md:px-10">
-          <p className="text-sm font-semibold uppercase tracking-[1.4px]">BucketShot</p>
+
+        <header className="relative z-10 flex items-start justify-between px-6 pt-8 md:px-10 md:pt-10">
+          <p className="bs-landing-display bs-landing-hero-stagger text-4xl tracking-tight md:text-6xl lg:text-7xl">BucketShot</p>
           <button
             type="button"
             onClick={() => app.setAuthReason("signIn")}
-            className="rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur transition-colors hover:bg-white/16"
+            className="bs-landing-hero-stagger mt-2 shrink-0 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm backdrop-blur-md transition-colors hover:border-white/30 hover:bg-white/15"
           >
             Sign in
           </button>
         </header>
-        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-88px)] max-w-6xl flex-col justify-end px-6 pb-20 md:px-10">
-          <div className="bs-landing-hero-copy">
-            <p className="text-sm uppercase tracking-[1.4px] text-white/70">Photography, planned</p>
-            <h1 className="mt-3 max-w-3xl text-5xl font-semibold tracking-tight md:text-7xl">Places worth photographing.</h1>
-            <p className="mt-4 max-w-xl text-lg text-white/80">
-              Find the location, learn the composition, and plan the trip around the light.
-            </p>
-            <form onSubmit={goToSearch} className="mt-8 max-w-xl">
-              <label htmlFor="landing-search" className="sr-only">
-                Search places, shots, photographers
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="landing-search"
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search places, shots, photographers"
-                  className="h-12 flex-1 rounded-full border border-white/20 bg-white/10 px-5 text-white outline-none backdrop-blur placeholder:text-white/45 focus:border-white/40"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 rounded-full bg-[#e8a84a] px-5 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/discover" className="rounded-full bg-[#e8a84a] px-6 py-3 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]">
-                Enter the catalog
-              </Link>
-              <Link href="/map" className="rounded-full border border-white/25 px-6 py-3 transition-colors hover:border-white/50 hover:bg-white/5">
-                Open the map
-              </Link>
+
+        <div className="relative z-10 mx-auto mt-auto flex w-full max-w-6xl flex-col px-6 pb-16 pt-16 md:px-10 md:pb-24">
+          <p className="bs-landing-hero-stagger text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Photography, planned</p>
+          <h1 className="bs-landing-display bs-landing-hero-stagger mt-4 max-w-4xl text-[2.75rem] leading-[1.05] md:text-6xl lg:text-[4.25rem]">
+            Places worth photographing.
+          </h1>
+          <p className="bs-landing-hero-stagger mt-5 max-w-lg text-base text-white/75 md:text-lg">
+            Find the location, learn the composition, and plan the trip around the light.
+          </p>
+
+          <form onSubmit={goToSearch} className="bs-landing-hero-stagger mt-10 w-full max-w-2xl">
+            <label htmlFor="landing-search" className="sr-only">
+              Search places, shots, photographers
+            </label>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <input
+                id="landing-search"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search places, shots, photographers"
+                className="h-14 flex-1 rounded-2xl border border-white/18 bg-white/10 px-5 text-white outline-none backdrop-blur-md placeholder:text-white/40 focus:border-[#e8a84a]/60 focus:ring-2 focus:ring-[#e8a84a]/25"
+              />
+              <button
+                type="submit"
+                className="h-14 shrink-0 rounded-2xl bg-[#e8a84a] px-8 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Search
+              </button>
             </div>
+          </form>
+
+          {hero ? (
+            <p className="bs-landing-hero-stagger mt-4 text-sm text-white/50">
+              Now featuring <span className="text-white/80">{hero.name}</span>
+            </p>
+          ) : null}
+
+          <div className="bs-landing-hero-stagger mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            <Link href="/discover" className="text-white/70 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white">
+              Enter the catalog
+            </Link>
+            <Link href="/map" className="text-white/70 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white">
+              Open the map
+            </Link>
           </div>
         </div>
       </section>
 
-      <FeatureBand
-        overline="Discover"
-        title="A curated UK catalog"
-        detail="Browse destinations, projects, and Bucket Shots that show where to stand, what to face, and which light to wait for."
-        href="/discover"
-        cta="Explore Discover"
-        image={discoverImage}
-        imageAlt={destinations[1]?.name ?? "Destination"}
-      />
-
-      <FeatureBand
-        overline="Map"
-        title="See every location in place"
-        detail="Open the map to filter by region, find nearby spots, and jump straight into a location or shot."
-        href="/map"
-        cta="Open the map"
-        image={mapImage}
-        imageAlt={locations[0]?.name ?? "Location"}
-        reverse
-      />
-
-      <FeatureBand
-        overline="Plan"
-        title="Save shots. Build the trip."
-        detail="Keep a bucket list, assemble weekend itineraries, and track gear—synced with the same account as iOS."
-        href="/bucket"
-        cta="Open your bucket"
-        secondaryHref="/trips"
-        secondaryCta="View trips"
-        image={planImage}
-        imageAlt={shots[0]?.title ?? "Bucket Shot"}
-      />
-
-      <section className="border-t border-white/10 px-6 py-24 md:px-10">
-        <div className="mx-auto grid max-w-6xl items-center gap-14 md:grid-cols-2">
+      <section className="border-t border-white/8 px-6 py-20 md:px-10 md:py-28">
+        <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="text-sm uppercase tracking-[1.4px] text-[#e8a84a]">Also on iOS</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">The same catalog in your pocket</h2>
-            <p className="mt-4 max-w-md text-base text-white/70">
+            <p className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Destinations</p>
+            <h2 className="bs-landing-display mt-3 text-3xl md:text-5xl">Start with a place that pulls you in.</h2>
+            <p className="mt-4 max-w-xl text-white/65">A curated UK catalog—from coastlines to glens—each with locations and shots worth the drive.</p>
+          </Reveal>
+          <Reveal className="mt-12" delay={80}>
+            <div className="bs-landing-rail no-scrollbar -mx-6 px-6 md:-mx-0 md:px-0">
+              {railDestinations.map((destination) => (
+                <Link key={destination.id} href={`/destinations/${destination.id}`} className="bs-landing-rail-card group block overflow-hidden rounded-[18px]">
+                  <div className="relative aspect-[3/4] overflow-hidden">
+                    <Cover src={destination.coverImage.url} alt={destination.name} className="bs-landing-rail-cover h-full w-full" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-4">
+                      <p className="text-lg font-semibold">{destination.name}</p>
+                      <p className="mt-1 text-sm text-white/65">{destination.region}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-t border-white/8 px-6 py-20 md:px-10 md:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-12 lg:gap-10">
+          <Reveal className="lg:col-span-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Discover</p>
+            <h2 className="bs-landing-display mt-3 text-3xl md:text-5xl">Learn the shot before you arrive.</h2>
+            <p className="mt-4 text-white/65">
+              Bucket Shots show where to stand, what to face, and which light to wait for—so your first frame isn&apos;t a guess.
+            </p>
+            <Link
+              href="/discover"
+              className="mt-8 inline-flex rounded-2xl bg-[#e8a84a] px-6 py-3 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]"
+            >
+              Explore Discover
+            </Link>
+          </Reveal>
+          <Reveal className="lg:col-span-7" delay={100}>
+            <div className="grid grid-cols-12 gap-3 md:gap-4">
+              <ParallaxMedia className="col-span-12 md:col-span-8">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] md:aspect-[5/6]">
+                  <Cover src={discoverHero} alt={primaryShot?.title ?? "Bucket Shot"} className="h-full w-full" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  {primaryShot ? (
+                    <p className="absolute bottom-4 left-4 right-4 text-sm font-medium text-white/90">{primaryShot.title}</p>
+                  ) : null}
+                </div>
+              </ParallaxMedia>
+              <div className="col-span-12 flex flex-col gap-3 md:col-span-4">
+                {secondaryShot ? (
+                  <Link href={`/shots/${secondaryShot.id}`} className="group relative aspect-[4/3] overflow-hidden rounded-[16px]">
+                    <Cover src={secondaryShot.coverImage.url} alt={secondaryShot.title} className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-black/25" />
+                    <p className="absolute bottom-3 left-3 text-xs font-medium">{secondaryShot.title}</p>
+                  </Link>
+                ) : null}
+                {secondaryLocation ? (
+                  <Link href={`/locations/${secondaryLocation.id}`} className="group relative aspect-[4/3] overflow-hidden rounded-[16px]">
+                    <Cover src={secondaryLocation.coverImage.url} alt={secondaryLocation.name} className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-black/25" />
+                    <p className="absolute bottom-3 left-3 text-xs font-medium">{secondaryLocation.name}</p>
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-t border-white/8 px-6 py-20 md:px-10 md:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+          <Reveal>
+            <ParallaxMedia>
+              <div className="bs-landing-map-frame overflow-hidden rounded-[20px] p-3 md:p-4">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[14px]">
+                  <Cover src={mapImage} alt="Map preview" className="h-full w-full opacity-90" />
+                  <div className="absolute inset-0 bg-[#0c0c0d]/25" />
+                  <span className="absolute left-4 top-4 rounded-md bg-black/50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/80 backdrop-blur">
+                    UK catalog
+                  </span>
+                  <span className="absolute right-4 top-4 rounded-md bg-black/50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/80 backdrop-blur">
+                    MapLibre
+                  </span>
+                  <span className="bs-landing-map-pin left-[28%] top-[42%]" aria-hidden="true" />
+                  <span className="bs-landing-map-pin left-[52%] top-[55%]" aria-hidden="true" />
+                  <span className="bs-landing-map-pin left-[68%] top-[38%]" aria-hidden="true" />
+                </div>
+              </div>
+            </ParallaxMedia>
+          </Reveal>
+          <Reveal delay={100}>
+            <p className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Map</p>
+            <h2 className="bs-landing-display mt-3 text-3xl md:text-5xl">See every location in place.</h2>
+            <p className="mt-4 text-white/65">Filter by region, find what&apos;s nearby, and jump straight into a location or Bucket Shot.</p>
+            <Link href="/map" className="mt-8 inline-flex rounded-2xl border border-white/20 px-6 py-3 transition-colors hover:border-white/40 hover:bg-white/5">
+              Open the map
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-t border-white/8 px-6 py-20 md:px-10 md:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-12">
+          <Reveal className="lg:col-span-5 lg:order-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Plan</p>
+            <h2 className="bs-landing-display mt-3 text-3xl md:text-5xl">Plan the weekend around the light.</h2>
+            <p className="mt-4 text-white/65">Save shots to your bucket, build an itinerary, and keep a gear list—synced with the same account as iOS.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/bucket" className="rounded-2xl bg-[#e8a84a] px-6 py-3 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]">
+                Open your bucket
+              </Link>
+              <Link href="/trips" className="rounded-2xl border border-white/20 px-6 py-3 transition-colors hover:border-white/40 hover:bg-white/5">
+                View trips
+              </Link>
+            </div>
+          </Reveal>
+          <Reveal className="lg:col-span-7 lg:order-1" delay={80}>
+            <ParallaxMedia>
+              <div className="relative mx-auto max-w-md overflow-hidden rounded-[20px]">
+                <Cover src={planImage} alt={shots[2]?.title ?? primaryShot?.title ?? "Trip planning"} className="aspect-[3/4] w-full" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              </div>
+            </ParallaxMedia>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-t border-white/8 px-6 py-24 md:px-10">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+          <Reveal>
+            <p className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#e8a84a]">Also on iOS</p>
+            <h2 className="bs-landing-display mt-3 text-3xl md:text-5xl">The same catalog in your pocket.</h2>
+            <p className="mt-4 max-w-md text-white/65">
               Sign in once—saves, trips, and collections stay in sync between the web companion and the iOS app.
             </p>
             <a
               href={APP_STORE_URL}
               target="_blank"
               rel="noreferrer"
-              className="mt-8 inline-flex rounded-full bg-white px-6 py-3 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]"
+              className="mt-8 inline-flex rounded-2xl bg-white px-6 py-3 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]"
             >
               Download on the App Store
             </a>
           </Reveal>
-          <Reveal className="flex justify-center gap-4 md:justify-end" delay={120}>
+          <Reveal className="flex justify-center gap-5 lg:justify-end" delay={120}>
             {IOS_SCREENSHOTS.map((shot) => (
               <PhoneFrame key={shot.src} src={shot.src} label={shot.label} />
             ))}
           </Reveal>
         </div>
+      </section>
+
+      <section className="border-t border-white/8 px-6 py-20 md:px-10">
+        <Reveal className="mx-auto max-w-6xl text-center">
+          <h2 className="bs-landing-display text-3xl md:text-4xl">Ready when the light is.</h2>
+          <p className="mx-auto mt-4 max-w-md text-white/60">Browse the catalog as a guest, or sign in to save, publish, and plan.</p>
+          <Link
+            href="/discover"
+            className="mt-8 inline-flex rounded-2xl bg-[#e8a84a] px-8 py-3.5 font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]"
+          >
+            Enter the catalog
+          </Link>
+        </Reveal>
       </section>
 
       <footer className="border-t border-white/10 px-6 py-10 md:px-10">
@@ -166,55 +294,34 @@ export default function LandingPage() {
   );
 }
 
-function FeatureBand({
-  overline,
-  title,
-  detail,
-  href,
-  cta,
-  secondaryHref,
-  secondaryCta,
-  image,
-  imageAlt,
-  reverse = false,
-}: {
-  overline: string;
-  title: string;
-  detail: string;
-  href: string;
-  cta: string;
-  secondaryHref?: string;
-  secondaryCta?: string;
-  image?: string | null;
-  imageAlt: string;
-  reverse?: boolean;
-}) {
+function ParallaxMedia({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    function onScroll() {
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const viewMid = window.innerHeight * 0.5;
+      const delta = (rect.top + rect.height * 0.5 - viewMid) * 0.06;
+      setOffset(Math.max(-24, Math.min(24, delta)));
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <section className="border-t border-white/10 px-6 py-20 md:px-10 md:py-28">
-      <div className={`mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2 md:gap-16 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
-        <Reveal>
-          <p className="text-sm uppercase tracking-[1.4px] text-[#e8a84a]">{overline}</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>
-          <p className="mt-4 max-w-md text-base text-white/70">{detail}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={href} className="rounded-full bg-[#e8a84a] px-5 py-2.5 text-sm font-semibold text-[#0c0c0d] transition-transform hover:scale-[1.02]">
-              {cta}
-            </Link>
-            {secondaryHref && secondaryCta ? (
-              <Link href={secondaryHref} className="rounded-full border border-white/25 px-5 py-2.5 text-sm transition-colors hover:border-white/50 hover:bg-white/5">
-                {secondaryCta}
-              </Link>
-            ) : null}
-          </div>
-        </Reveal>
-        <Reveal delay={100}>
-          <div className="bs-landing-feature-media relative aspect-[4/3] overflow-hidden rounded-[20px]">
-            <Cover src={image} alt={imageAlt} className="h-full w-full transition-transform duration-700 ease-out hover:scale-[1.03]" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
-          </div>
-        </Reveal>
-      </div>
-    </section>
+    <div ref={ref} className={`bs-landing-parallax-wrap ${className}`} style={{ transform: `translateY(${offset}px)` }}>
+      {children}
+    </div>
   );
 }
 
@@ -222,10 +329,10 @@ function PhoneFrame({ src, label }: { src: string; label: string }) {
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="bs-landing-phone w-[140px] sm:w-[160px]">
-      <div className="relative aspect-[9/19] overflow-hidden rounded-[28px] border border-white/20 bg-[#18181a] shadow-[0_24px_48px_rgb(0_0_0_/_0.45)]">
-        <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-2">
-          <div className="h-5 w-16 rounded-full bg-black/80" />
+    <div className="bs-landing-phone w-[148px] sm:w-[168px]">
+      <div className="relative aspect-[9/19] overflow-hidden rounded-[32px] border border-white/18 bg-[#18181a] shadow-[0_28px_56px_rgb(0_0_0_/_0.5)]">
+        <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-2.5">
+          <div className="h-5 w-[72px] rounded-full bg-black/85" />
         </div>
         {!failed ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -262,7 +369,7 @@ function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; 
           observer.disconnect();
         }
       },
-      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
