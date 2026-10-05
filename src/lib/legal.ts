@@ -1,4 +1,4 @@
-export const CONTACT_EMAIL = "support@bucketshot.app";
+export const CONTACT_EMAIL = "trywaffle@gmail.com";
 
 export const LEGAL_EFFECTIVE_DATE = "5 October 2026";
 
