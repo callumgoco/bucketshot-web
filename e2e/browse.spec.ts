@@ -11,4 +11,8 @@ test("guest can browse discover, search, and a destination", async ({ page }) =>
   await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
   await page.goto("/map");
   await expect(page.getByRole("link", { name: "Search this area" })).toBeVisible();
+  await page.goto("/privacy");
+  await expect(page.getByRole("heading", { name: "Privacy Policy" })).toBeVisible();
+  await page.goto("/terms");
+  await expect(page.getByRole("heading", { name: "Terms of Use" })).toBeVisible();
 });

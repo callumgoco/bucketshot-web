@@ -42,6 +42,11 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+        <nav className="mt-12 flex flex-wrap gap-x-4 gap-y-2 text-sm text-white/65" aria-label="Legal">
+          <Link href="/privacy" className="hover:text-white">Privacy</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/terms" className="hover:text-white">Terms</Link>
+        </nav>
       </main>
     </div>
   );

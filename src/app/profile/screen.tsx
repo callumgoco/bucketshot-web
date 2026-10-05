@@ -15,6 +15,11 @@ export default function ProfilePage() {
         <p className="text-[var(--bs-text-secondary)]">Sign in to publish photographs, follow photographers, and sync trips with the iOS app.</p>
         <PrimaryButton onClick={() => app.setAuthReason("signIn")}>Sign in</PrimaryButton>
         <button onClick={() => app.setAuthReason("signIn")} className="text-sm">Create account</button>
+        <div className="flex justify-center gap-3 pt-2 text-sm text-[var(--bs-text-secondary)]">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/settings/appearance">Appearance</Link>
+        </div>
       </div>
     );
   }
@@ -24,6 +29,8 @@ export default function ProfilePage() {
       <div className="mb-6 flex justify-between">
         <h1 className="text-[22px] font-semibold">Profile</h1>
         <div className="flex gap-3 text-sm">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
           <Link href="/settings/appearance">Appearance</Link>
           <Link href="/profile/edit">Edit</Link>
         </div>
