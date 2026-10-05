@@ -45,9 +45,22 @@ export function moonPhase(coordinate: GeoCoordinate, date = new Date()) {
   };
 }
 
-export function formatClock(date: Date | null) {
+export function formatClock(date: Date | null, timeZone?: string) {
   if (!date || Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone });
+}
+
+function localMinutes(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone }).formatToParts(date);
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
+  return hour * 60 + minute;
+}
+
+/** Guard against timezone/formatting bugs — sunrise should precede sunset in local time. */
+export function lightTimesArePlausible(times: LightTimes, timeZone: string) {
+  if (!times.sunrise || !times.sunset) return false;
+  return localMinutes(times.sunrise, timeZone) < localMinutes(times.sunset, timeZone);
 }
 
 export type WeatherSnapshot = {

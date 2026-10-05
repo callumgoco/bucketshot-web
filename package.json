@@ -20,7 +20,8 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "suncalc": "^2.0.2",
-    "supercluster": "^9.1.0"
+    "supercluster": "^9.1.0",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

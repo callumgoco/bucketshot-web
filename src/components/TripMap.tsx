@@ -6,6 +6,7 @@ import * as maplibre from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const maplibregl = (("Map" in maplibre ? maplibre : (maplibre as { default: typeof maplibre }).default) as typeof import("maplibre-gl"));
+import { mapBasemapStyle } from "@/lib/mapStyle";
 import type { CatalogSnapshot, Trip } from "@/lib/domain/types";
 
 export function TripMap({ trip, catalog }: { trip: Trip; catalog: CatalogSnapshot }) {
@@ -14,18 +15,7 @@ export function TripMap({ trip, catalog }: { trip: Trip; catalog: CatalogSnapsho
     if (!node.current) return;
     const map = new maplibregl.Map({
       container: node.current,
-      style: {
-        version: 8,
-        sources: {
-          carto: {
-            type: "raster",
-            tiles: ["https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png"],
-            tileSize: 256,
-            attribution: "&copy; OpenStreetMap &copy; CARTO",
-          },
-        },
-        layers: [{ id: "carto", type: "raster", source: "carto" }],
-      },
+      style: mapBasemapStyle(),
       center: [-4, 56],
       zoom: 6,
     });

@@ -8,6 +8,7 @@ The web companion to the BucketShot iOS app. It uses the same Supabase project, 
 cd bucketshot-web
 cp .env.example .env.local
 # fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+# optional: NEXT_PUBLIC_CARTO_API_KEY from https://carto.com/basemaps/apikey
 npm install
 npm run dev
 ```
@@ -23,7 +24,7 @@ Add `http://localhost:3000/auth/callback` to Supabase **Authentication → URL C
 
 ## Substitutions from iOS
 
-- Maps: MapLibre GL with CARTO light/dark tiles, not MapKit
+- Maps: MapLibre GL with CARTO light/dark tiles when `NEXT_PUBLIC_CARTO_API_KEY` is set, otherwise OpenStreetMap
 - Weather: Open-Meteo, not WeatherKit
 - Sun and moon: `suncalc`, checked against the same coordinate math
 - Auth: email/password and magic link. Sign in with Apple stays on iOS

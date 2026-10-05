@@ -7,24 +7,10 @@ import * as maplibre from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const maplibregl = (("Map" in maplibre ? maplibre : (maplibre as { default: typeof maplibre }).default) as typeof import("maplibre-gl"));
+import { mapBasemapStyle } from "@/lib/mapStyle";
 import { useApp } from "@/components/AppState";
 import { categoryLabels, type AccessDifficulty, type PhotographyCategory } from "@/lib/domain/types";
 import { clusterLocations, regionContains } from "@/lib/services/clustering";
-
-function rasterStyle(dark: boolean) {
-  return {
-    version: 8 as const,
-    sources: {
-      carto: {
-        type: "raster" as const,
-        tiles: [`https://basemaps.cartocdn.com/${dark ? "dark_all" : "light_all"}/{z}/{x}/{y}@2x.png`],
-        tileSize: 256,
-        attribution: "&copy; OpenStreetMap &copy; CARTO",
-      },
-    },
-    layers: [{ id: "carto", type: "raster" as const, source: "carto" }],
-  };
-}
 
 export default function MapPage() {
   const app = useApp();
@@ -54,7 +40,7 @@ export default function MapPage() {
     const dark = document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     const map = new maplibregl.Map({
       container: mapNode.current,
-      style: rasterStyle(dark),
+      style: mapBasemapStyle(dark),
       center: [-3.5, 55.2],
       zoom: 5.4,
     });
